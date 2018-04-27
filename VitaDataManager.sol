@@ -60,7 +60,7 @@ contract VitaDataManager is VitaDeviceManager {
 	}
 
 	function queryData(String flags) returns(string[] data, uint[] timestamp, address[] deviceId, string[] deviceType, string[] deviceVersion, string[] flags) {
-
+		//seems like not able to return array of string (https://ethereum.stackexchange.com/questions/17312/solidity-can-you-return-dynamic-arrays-in-a-function)
 	}
 
 }
