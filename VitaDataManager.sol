@@ -9,13 +9,17 @@ contract VitaDataManager is VitaDeviceManager {
 	using SafeMath for uint;
 	using strings for *;
 
-	address[] deviceList;
-	uint totalFlags;
-	string[] flagList;
+	uint public totalFlags;
+	string[] public flagList;
 	mapping(string => string[]) flagToDataMap;
-	mapping(address => string[]) deviceToDataMap;
 
+    event DataUploaded(
+        address deviceId,
+        uint timstamp
+    );
+ 
     function isFlagsExist(string flags) returns (bool isExist){
+
         for (uint i=0;i<totalFlags;i++) {
             if (keccak256(flagList[i]) == keccak256(flags)) {
                 return true;
@@ -25,12 +29,14 @@ contract VitaDataManager is VitaDeviceManager {
     }
 
 	function upload(string vitaData, string metaData, address deviceId, string deviceType, string deviceVersion, string flags) allowedDevice(deviceId) public {
- 
+
 		string memory dataPrefix = '{"vitaData":{'.toSlice().concat(vitaData.toSlice());
-		string memory dataPostFix = '}, "metaData":{'.toSlice().concat(metaData.toSlice()).toSlice().concat('}}'.toSlice());
+		string memory dataPostFix = '}, "metaData":{'.toSlice().concat(metaData.toSlice()).toSlice().concat('}'.toSlice());
 		string memory dataRes = dataPrefix.toSlice().concat(dataPostFix.toSlice());
+
 		if (!isFlagsExist(flags)) {
 		    flagList.push(flags);
+		    totalFlags = totalFlags.safeAdd(1);
 		    flagToDataMap[flags] = new string[](0);
 		}
 		flagToDataMap[flags].push(dataRes);
@@ -38,6 +44,7 @@ contract VitaDataManager is VitaDeviceManager {
 		string memory flagDeviceType = flags.toSlice().concat(deviceType.toSlice());
 		if (!isFlagsExist(flagDeviceType)) {
 		    flagList.push(flagDeviceType);
+		    totalFlags = totalFlags.safeAdd(1);
 		    flagToDataMap[flagDeviceType] = new string[](0);
 		}
 		flagToDataMap[flagDeviceType].push(dataRes);
@@ -45,11 +52,14 @@ contract VitaDataManager is VitaDeviceManager {
 		string memory flagDeviceTypeDeviceVersion = flags.toSlice().concat(deviceType.toSlice()).toSlice().concat(deviceVersion.toSlice());
 		if (!isFlagsExist(flagDeviceTypeDeviceVersion)) {
 		    flagList.push(flagDeviceTypeDeviceVersion);
+		    totalFlags = totalFlags.safeAdd(1);
 		    flagToDataMap[flagDeviceTypeDeviceVersion] = new string[](0);
 		}
 		flagToDataMap[flagDeviceTypeDeviceVersion].push(dataRes);
 		
-		deviceToDataMap[deviceId].push(dataRes);
+		DataUploaded(deviceId, now);
+		//transfer money will cause failed
+		//transfer(deviceId, 1 wei);
 	}
 
     function querySummary(string flags, string deviceType, string deivceVersion) returns(uint count) {
@@ -99,14 +109,15 @@ contract VitaDataManager is VitaDeviceManager {
     // 2. flags
     // 3. data
     function jsonFactory(string[] rawResult, string flags) internal returns(string dataInJson){
+        
         if(rawResult.length == 0) {
-            dataInJson = '{ "result":{"status":404, "flags":"'.toSlice().concat(flags.toSlice()).toSlice().concat( '", "data":""}}'.toSlice());
+            dataInJson = '{ "result":{"status":404, "flags":"'.toSlice().concat(flags.toSlice()).toSlice().concat( '", "data":""'.toSlice());
         } else {
             dataInJson = '{ "result":{"status":200, "flags":"'.toSlice().concat(flags.toSlice()).toSlice().concat( '", "data":"'.toSlice());
             for (uint i=0;i<rawResult.length;i++) {
-                dataInJson.toSlice().concat(rawResult[i].toSlice());
+                dataInJson = dataInJson.toSlice().concat(rawResult[i].toSlice()).toSlice().concat(",".toSlice());
             }
         }
-        return dataInJson;
+        dataInJson = dataInJson.toSlice().concat('}}'.toSlice());
     }
 }
