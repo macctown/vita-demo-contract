@@ -2,10 +2,12 @@ pragma solidity ^0.4.11;
 
 import './VitaDataToken.sol';
 import './SafeMath.sol';
+import './strings.sol';
 
 contract VitaDeviceManager is VitaDataToken {
 	
 	using SafeMath for uint;
+	using strings for *;
 
 	struct GeneralDevice {
         address deviceId;
@@ -15,11 +17,30 @@ contract VitaDeviceManager is VitaDataToken {
 	
 	uint totalDevice;
 	address[] deviceList;
-	mapping(address => bool) devicePermission;
+	mapping(address => bool) public devicePermission;
 	mapping(address => GeneralDevice) deviceInfos;
 
 	event NewDevice (
       address deviceId
+    );
+    
+    event DeviceAllowed (
+      address deviceId
+    );
+    
+    event DeviceDisallowed (
+      address deviceId
+    );
+    
+    event debug (
+        address deviceId,
+        string deviceType,
+        string deviceVersion
+    );
+    
+    event hash (
+        string str,
+        string hash
     );
 
 	modifier deviceExist(address deviceId) {
@@ -40,28 +61,31 @@ contract VitaDeviceManager is VitaDataToken {
     }
 
     function addDevice(address deviceId, string deviceVersion, string deviceType) deviceNotExist(deviceId) {
-        deviceInfos[deviceId] = GeneralDevice(deviceId, deviceVersion, deviceType);
+        deviceInfos[deviceId] = GeneralDevice(deviceId, deviceType, deviceVersion);
         devicePermission[deviceId] = false;
         totalDevice = totalDevice.safeAdd(1);
         deviceList.push(deviceId);
         NewDevice(deviceId);
     }
 
-	function allow(address deviceId) deviceExist(deviceId) public {
-		devicePermission[deviceId] = true;
-	}
-
-	function allow(string deviceType) public{
+    
+	function allow(string deviceType) public {
 		
 		for (uint i=0;i<totalDevice;i++) {
 			address deviceId = deviceList[i];
 			GeneralDevice curDevice = deviceInfos[deviceId];
 			if (curDevice.deviceId != 0x0) {
-				if (keccak256(curDevice.deviceType) == keccak256(deviceType)) {
-					devicePermission[deviceId] = true;
-				}
+    			if (keccak256(curDevice.deviceType) == keccak256(deviceType)) {
+    				devicePermission[deviceId] = true;
+    				DeviceAllowed(deviceId);
+    			}
 			}
 		}
+	}
+
+	function allow(address deviceId) deviceExist(deviceId) public {
+		devicePermission[deviceId] = true;
+		DeviceAllowed(deviceId);
 	}
 
 	function allow(string deviceType, string deviceVersion) public{
@@ -70,15 +94,17 @@ contract VitaDeviceManager is VitaDataToken {
 			address deviceId = deviceList[i];
 			GeneralDevice curDevice = deviceInfos[deviceId];
 			if (curDevice.deviceId != 0x0) {
-				if (keccak256(curDevice.deviceType) == keccak256(deviceType) && keccak256(curDevice.deviceVersion) == keccak256(deviceVersion)) {
-					devicePermission[deviceId] = true;
-				}
+    			if (keccak256(curDevice.deviceType) == keccak256(deviceType) && keccak256(curDevice.deviceVersion) == keccak256(deviceVersion)) {
+    				devicePermission[deviceId] = true;
+    				DeviceAllowed(deviceId);
+    			}
 			}
 		}
 	}
 
 	function disallow(address deviceId) deviceExist(deviceId) public {
 		devicePermission[deviceId] = false;
+		DeviceDisallowed(deviceId);
 	}
 
 	function disallow(string deviceType) public{
@@ -89,6 +115,7 @@ contract VitaDeviceManager is VitaDataToken {
 			if (curDevice.deviceId != 0x0) {
 				if (keccak256(curDevice.deviceType) == keccak256(deviceType)) {
 					devicePermission[deviceId] = false;
+					DeviceDisallowed(deviceId);
 				}
 			}
 		}
@@ -102,6 +129,7 @@ contract VitaDeviceManager is VitaDataToken {
 			if (curDevice.deviceId != 0x0) {
 				if (keccak256(curDevice.deviceType) == keccak256(deviceType) && keccak256(curDevice.deviceVersion) == keccak256(deviceVersion)) {
 					devicePermission[deviceId] = false;
+					DeviceDisallowed(deviceId);
 				}
 			}
 		}
