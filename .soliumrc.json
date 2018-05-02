@@ -12,6 +12,7 @@
       "error",
       4
     ],
-    "security/no-block-members": "off"
+    "security/no-block-members": "off",
+    "no-experimental": "off"
   }
 }

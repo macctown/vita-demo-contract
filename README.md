@@ -22,3 +22,15 @@ npm install -g truffle
 ```
 npm install -g solium
 ```
+
+Currently, VSCode-solidity doesn't support .soliumrc.json, we can setup vscode settings same as .soliumrc.json:
+
+```
+"solidity.linter": "solium",
+"solidity.soliumRules": {
+"quotes": ["error", "double"],
+"indentation": ["error", 4],
+"no-experimental": "off"
+}
+```
+

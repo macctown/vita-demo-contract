@@ -5,6 +5,8 @@ import "./VitaDataToken.sol";
 import "./lib/SafeMath.sol";
 import "./lib/strings.sol";
 
+
+//TODO add C level check
 contract VitaDeviceManager is VitaDataToken {
 
     using SafeMath for uint;
@@ -33,44 +35,31 @@ contract VitaDeviceManager is VitaDataToken {
         address deviceId
     );
 
-    event debug (
-        address deviceId,
-        string deviceType,
-        string deviceVersion
-    );
-
-    event hash (
-        string str,
-        string hash
-    );
-
     modifier deviceExist(address deviceId) {
-        var device = deviceInfos[deviceId];
-        assert(device.deviceId != 0x0);
+        require(deviceInfos[deviceId] != address(0x0));
         _;
     }
 
     modifier deviceNotExist(address deviceId) {
-        var device = deviceInfos[deviceId];
-        assert(device.deviceId == 0x0);
+        require(device.deviceId == address(0x0));
         _;
     }
 
     modifier allowedDevice(address deviceId) {
-        assert(devicePermission[deviceId]);
+        require(devicePermission[deviceId]);
         _;
     }
 
-    function addDevice(address deviceId, string deviceVersion, string deviceType) deviceNotExist(deviceId)  public {
+    function addDevice(address deviceId, string deviceVersion, string deviceType) validAddress(deviceId) deviceNotExist(deviceId)  external {
         deviceInfos[deviceId] = GeneralDevice(deviceId, deviceType, deviceVersion);
-        devicePermission[deviceId] = false;
+        devicePermission[deviceId] = true;
         totalDevice = totalDevice.safeAdd(1);
         deviceList.push(deviceId);
         emit NewDevice(deviceId);
     }
 
 
-    function allow(string deviceType) public {
+    function allow(string deviceType) external {
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];
@@ -84,12 +73,12 @@ contract VitaDeviceManager is VitaDataToken {
         }
     }
 
-    function allow(address deviceId) deviceExist(deviceId) public {
+    function allow(address deviceId) validAddress(deviceId) deviceExist(deviceId) external {
         devicePermission[deviceId] = true;
         emit DeviceAllowed(deviceId);
     }
 
-    function allow(string deviceType, string deviceVersion) public{
+    function allow(string deviceType, string deviceVersion) external {
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];
@@ -103,12 +92,12 @@ contract VitaDeviceManager is VitaDataToken {
         }
     }
 
-    function disallow(address deviceId) deviceExist(deviceId) public {
+    function disallow(address deviceId) validAddress(deviceId) deviceExist(deviceId) external {
         devicePermission[deviceId] = false;
         emit DeviceDisallowed(deviceId);
     }
 
-    function disallow(string deviceType) public{
+    function disallow(string deviceType) external{
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];
@@ -122,7 +111,7 @@ contract VitaDeviceManager is VitaDataToken {
         }
     }
 
-    function disallow(string deviceType, string deviceVersion) public{
+    function disallow(string deviceType, string deviceVersion) external{
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];

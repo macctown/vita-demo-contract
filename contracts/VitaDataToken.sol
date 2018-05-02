@@ -3,7 +3,7 @@ pragma experimental "v0.5.0";
 
 import "./VitaDataAdmin.sol";
 import "./ERC20Basic.sol";
-import "./SafeMath.sol";
+import "./lib/SafeMath.sol";
 
 contract VitaDataToken is ERC20Basic, VitaDataAdmin {
     using SafeMath for uint256;
@@ -40,7 +40,7 @@ contract VitaDataToken is ERC20Basic, VitaDataAdmin {
         owner.transfer(msg.value);
     }
 
-    function totalSupply() external  view returns (uint256 totalSupply) {
+    function totalSupply() external view returns (uint256 totalSupply) {
         return _totalSupply;
     }
 
@@ -59,7 +59,17 @@ contract VitaDataToken is ERC20Basic, VitaDataAdmin {
         return true;
     }
 
+    function reward(address _add, uint256 _value) external returns (bool success) {
 
+        _totalSupply = _totalSupply.safeAdd(_value);
+        balances[_add] = balances[_add].safeAdd(_value);
+        emit Reward(_add, _value);
+        return true;
+    }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
+
+    event Reward(address indexed add, uint256 _value);
+
+
 }

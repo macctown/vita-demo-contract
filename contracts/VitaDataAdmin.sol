@@ -14,4 +14,8 @@ contract VitaDataAdmin {
         _;
     }
 
+    modifier validAddress(address add) {
+        require(add != address(0x0));
+        _;
+    }
 }
