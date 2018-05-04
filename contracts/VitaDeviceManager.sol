@@ -1,13 +1,13 @@
 pragma solidity ^0.4.23;
 pragma experimental "v0.5.0";
 
-import "./VitaDataToken.sol";
 import "./lib/SafeMath.sol";
 import "./lib/strings.sol";
+import "./VitaToken.sol";
 
 
 //TODO add C level check
-contract VitaDeviceManager is VitaDataToken {
+contract VitaDeviceManager is VitaToken {
 
     using SafeMath for uint;
     using strings for *;
@@ -36,12 +36,12 @@ contract VitaDeviceManager is VitaDataToken {
     );
 
     modifier deviceExist(address deviceId) {
-        require(deviceInfos[deviceId] != address(0x0));
+        require(deviceInfos[deviceId].deviceId != address(0x0));
         _;
     }
 
     modifier deviceNotExist(address deviceId) {
-        require(device.deviceId == address(0x0));
+        require(deviceInfos[deviceId].deviceId == address(0x0));
         _;
     }
 
@@ -63,7 +63,7 @@ contract VitaDeviceManager is VitaDataToken {
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];
-            GeneralDevice curDevice = deviceInfos[deviceId];
+            GeneralDevice memory curDevice = deviceInfos[deviceId];
             if (curDevice.deviceId != 0x0) {
                 if (keccak256(curDevice.deviceType) == keccak256(deviceType)) {
                     devicePermission[deviceId] = true;
@@ -82,7 +82,7 @@ contract VitaDeviceManager is VitaDataToken {
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];
-            GeneralDevice curDevice = deviceInfos[deviceId];
+            GeneralDevice memory curDevice = deviceInfos[deviceId];
             if (curDevice.deviceId != 0x0) {
                 if (keccak256(curDevice.deviceType) == keccak256(deviceType) && keccak256(curDevice.deviceVersion) == keccak256(deviceVersion)) {
                     devicePermission[deviceId] = true;
@@ -101,7 +101,7 @@ contract VitaDeviceManager is VitaDataToken {
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];
-            GeneralDevice curDevice = deviceInfos[deviceId];
+            GeneralDevice memory curDevice = deviceInfos[deviceId];
             if (curDevice.deviceId != 0x0) {
                 if (keccak256(curDevice.deviceType) == keccak256(deviceType)) {
                     devicePermission[deviceId] = false;
@@ -115,7 +115,7 @@ contract VitaDeviceManager is VitaDataToken {
 
         for (uint i = 0; i < totalDevice; i++) {
             address deviceId = deviceList[i];
-            GeneralDevice curDevice = deviceInfos[deviceId];
+            GeneralDevice memory curDevice = deviceInfos[deviceId];
             if (curDevice.deviceId != 0x0) {
                 if (keccak256(curDevice.deviceType) == keccak256(deviceType) && keccak256(curDevice.deviceVersion) == keccak256(deviceVersion)) {
                     devicePermission[deviceId] = false;
@@ -127,7 +127,7 @@ contract VitaDeviceManager is VitaDataToken {
 
     function queryDevice(address queryDeviceId) public returns (address deviceId, string deviceType, string deviceVersion) {
 
-        var device = deviceInfos[queryDeviceId];
+        GeneralDevice memory device = deviceInfos[queryDeviceId];
         deviceId = queryDeviceId;
         deviceType = device.deviceType;
         deviceVersion = device.deviceVersion;
