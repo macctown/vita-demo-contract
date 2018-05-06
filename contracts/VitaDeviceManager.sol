@@ -1,9 +1,9 @@
 pragma solidity ^0.4.23;
 pragma experimental "v0.5.0";
 
-import "./lib/SafeMath.sol";
-import "./lib/strings.sol";
-import "./token/VitaToken.sol";
+import "./SafeMath.sol";
+import "./strings.sol";
+import "./VitaToken.sol";
 
 
 //TODO add C level check

@@ -2,8 +2,8 @@ pragma solidity ^0.4.23;
 pragma experimental "v0.5.0";
 
 import "./VitaDeviceManager.sol";
-import "./lib/SafeMath.sol";
-import "./lib/strings.sol";
+import "./SafeMath.sol";
+import "./strings.sol";
 
 contract VitaDataManager is VitaDeviceManager {
 

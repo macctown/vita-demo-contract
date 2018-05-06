@@ -1,9 +1,9 @@
 pragma solidity ^0.4.23;
 pragma experimental "v0.5.0";
 
-import "../VitaDataAdmin.sol";
+import "./VitaDataAdmin.sol";
 import "./BasicToken.sol";
-import "../lib/SafeMath.sol";
+import "./SafeMath.sol";
 
 contract VitaToken is BasicToken, VitaDataAdmin {
 

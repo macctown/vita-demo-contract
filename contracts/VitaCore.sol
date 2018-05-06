@@ -4,6 +4,12 @@ import "./VitaDataManager.sol";
 
 contract VitaCore is VitaDataManager{
 
+
+
+    function Constructor() public pure{
+
+    }
+
     function upload(string vitaData, address deviceId, string flags) allowedDevice(deviceId) public {
 
         if (!isFlagsExist(flags)) {
@@ -37,6 +43,6 @@ contract VitaCore is VitaDataManager{
         /* solium-disable-next-line */
         emit DataUploaded(deviceId, now);
 
-        reward(deviceId, 1 wei);
+        reward(deviceId, 1);
     }
 }
