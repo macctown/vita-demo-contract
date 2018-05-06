@@ -3,7 +3,7 @@ pragma experimental "v0.5.0";
 
 import "./lib/SafeMath.sol";
 import "./lib/strings.sol";
-import "./VitaToken.sol";
+import "./token/VitaToken.sol";
 
 
 //TODO add C level check
@@ -125,7 +125,7 @@ contract VitaDeviceManager is VitaToken {
         }
     }
 
-    function queryDevice(address queryDeviceId) public returns (address deviceId, string deviceType, string deviceVersion) {
+    function queryDevice(address queryDeviceId) public view returns (address deviceId, string deviceType, string deviceVersion) {
 
         GeneralDevice memory device = deviceInfos[queryDeviceId];
         deviceId = queryDeviceId;

@@ -31,11 +31,11 @@ contract VitaDataManager is VitaDeviceManager {
 
 
 
-    function querySummary(string flags, string deviceType, string deivceVersion) external returns(uint count) {
+    function querySummary(string flags, string deviceType, string deivceVersion) external view returns(uint count) {
         return flagToDataMap[flags.toSlice().concat(deviceType.toSlice()).toSlice().concat(deivceVersion.toSlice())].length;
     }
 
-    function queryData(string flags, string deviceType, string deivceVersion) external returns(string dataInJson)  {
+    function queryData(string flags, string deviceType, string deivceVersion) external view returns(string dataInJson)  {
         string memory flagConcate = flags.toSlice().concat(deviceType.toSlice()).toSlice().concat(deivceVersion.toSlice());
         for (uint i = 0; i < totalFlags; i++) {
             if (keccak256(flagConcate) == keccak256(flagList[i])) {
@@ -45,11 +45,11 @@ contract VitaDataManager is VitaDeviceManager {
         return jsonFactory(new string[](0), flagConcate);
     }
 
-    function querySummary(string flags, string deviceType) external returns(uint count) {
+    function querySummary(string flags, string deviceType) external view returns(uint count) {
         return flagToDataMap[flags.toSlice().concat(deviceType.toSlice())].length;
     }
 
-    function queryData(string flags, string deviceType) external returns(string dataInJson)  {
+    function queryData(string flags, string deviceType) external view returns(string dataInJson)  {
 
         for (uint i = 0; i < totalFlags; i++) {
             if (keccak256(flags.toSlice().concat(deviceType.toSlice())) == keccak256(flagList[i])) {
@@ -59,11 +59,11 @@ contract VitaDataManager is VitaDeviceManager {
         return jsonFactory(new string[](0), flags.toSlice().concat(deviceType.toSlice()));
     }
 
-    function querySummary(string flags) external returns(uint count)  {
+    function querySummary(string flags) external view returns(uint count)  {
         return flagToDataMap[flags].length;
     }
 
-    function queryData(string flags) external returns(string dataInJson)  {
+    function queryData(string flags) external view returns(string dataInJson)  {
 
         for (uint i = 0; i < totalFlags; i++) {
             if (keccak256(flags) == keccak256(flagList[i])) {
@@ -77,7 +77,7 @@ contract VitaDataManager is VitaDeviceManager {
     // 1. status: 200, 404, 500
     // 2. flags
     // 3. data
-    function jsonFactory(string[] rawResult, string flags) internal returns(string dataInJson){
+    function jsonFactory(string[] rawResult, string flags) internal pure returns(string dataInJson){
 
         if(rawResult.length == 0) {
             /* solium-disable-next-line */
